@@ -27,7 +27,7 @@ rows.each do |row|
     symbol = page.css('div.first-row div.first-column.box-column').text.strip
     puts "#{name},#{isin},#{symbol}"
     if symbol
-      $db.execute "INSERT INTO INDEX_CONSTITUENTS VALUES (?,?,?,?,DATE('NOW'))", [index, isin, symbol, name]
+      $db.execute "INSERT INTO index_constituents VALUES (?,?,?,?,DATE('NOW'))", [index, isin, symbol, name]
     end
   end
 end
