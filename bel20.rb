@@ -6,8 +6,8 @@ require 'open-uri'
 require 'sqlite3'
 
 $db = SQLite3::Database.new('ic.sqlite')
-$db.execute "CREATE TABLE IF NOT EXISTS INDEX_CONSTITUENTS(
-  `index` VARCHAR(16) NOT NULL,
+$db.execute "CREATE TABLE IF NOT EXISTS index_constituents(
+  `inx` VARCHAR(16) NOT NULL,
   `isin` VARCHAR(12) NOT NULL, 
   `symbol` VARCHAR(10) NOT NULL, 
   `name` VARCHAR,
