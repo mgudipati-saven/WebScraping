@@ -1,4 +1,4 @@
-# Scrape ASX Index Constituents from http://preview.papdan.com/papdan/data/get_index_tables_price.php?content=<index>
+# Scrape ASX Index Constituents
 
 require 'rubygems'
 require 'nokogiri'
@@ -7,7 +7,7 @@ require 'sqlite3'
 
 $db = SQLite3::Database.new('ic.sqlite')
 $db.execute "CREATE TABLE IF NOT EXISTS index_constituents(
-  `inx` VARCHAR(16) NOT NULL,
+  `index` VARCHAR(16) NOT NULL,
   `isin` VARCHAR(12) NOT NULL, 
   `symbol` VARCHAR(10) NOT NULL, 
   `name` VARCHAR,
