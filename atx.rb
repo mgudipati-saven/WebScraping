@@ -13,7 +13,7 @@ $db.execute "CREATE TABLE IF NOT EXISTS index_constituents(
   `name` VARCHAR,
   `date` DATE NOT NULL)"
 
-index_a = ["atx", "atf", "atpx", "wbi", "iax"]
+index_a = ["ATX", "ATF", "ATPX", "WBI", "IAX"]
 index_a.each do |index|
   url = "http://en.indices.cc/indices/details/#{index}/composition/"
   page = Nokogiri::HTML(open(url))
@@ -24,7 +24,7 @@ index_a.each do |index|
     isin = row.css('th')[1].text.strip
     if isin
       puts "#{index},#{isin},#{name}"
-      $db.execute "INSERT INTO index_constituents VALUES (?,?,?,?,DATE('NOW'))", [index.upcase, isin, "", name]
+      $db.execute "INSERT INTO index_constituents VALUES (?,?,?,?,DATE('NOW'))", [index, isin, "", name]
     end
   end
 end
