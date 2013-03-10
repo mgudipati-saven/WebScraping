@@ -6,12 +6,13 @@ require 'open-uri'
 require 'sqlite3'
 
 $db = SQLite3::Database.new('ic.sqlite')
-$db.execute "CREATE TABLE IF NOT EXISTS index_constituents(
-  `index` VARCHAR(16) NOT NULL,
-  `isin` VARCHAR(12) NOT NULL, 
-  `symbol` VARCHAR(10) NOT NULL, 
-  `name` VARCHAR,
-  `date` DATE NOT NULL)"
+$db.execute "CREATE TABLE IF NOT EXISTS IndexConstituents(
+  [index] VARCHAR(16) NOT NULL,
+  isin    VARCHAR(12), 
+  ticker  VARCHAR(16),
+  name    VARCHAR,
+  wt      FLOAT,
+  asof    DATE DEFAULT (date('now')))"
 
 $base_url = "https://indices.nyx.com"
 $index_h = {
@@ -40,16 +41,24 @@ def scrape(index, mic, page)
   rows = page.css('div.index-composition-block table tr')[1..-1]
   puts "Number of rows: #{rows.length}"
   rows.each do |row|
-    name = row.css('td')[0].text.strip
-    isin = row.css('td')[1].text.strip
-    if isin
-      page = Nokogiri::HTML(open("https://europeanequities.nyx.com/en/nyx_eu_listings/real-time/quote?isin=#{isin}&mic=#{mic}"))
-      symbol = page.css('div.first-row div.first-column.box-column').text.strip
-      puts "#{name},#{isin},#{symbol}"
-      if symbol
-        $db.execute "INSERT INTO index_constituents VALUES (?,?,?,?,DATE('NOW'))", [index, isin, symbol, name]
-      end
-    end
+    col = row.css('td')[0]
+    if col then name = col.text.strip end
+
+    # wt. replace ',' with '.'
+    col = row.css('td')[3]
+    if col then wt = col.text.strip.gsub(',','.') end
+
+    col = row.css('td')[1]
+    if col then isin = col.text.strip end
+    #if isin
+      # fetch the quote page for ticker symbol...
+      #page = Nokogiri::HTML(open("https://europeanequities.nyx.com/en/nyx_eu_listings/real-time/quote?isin=#{isin}&mic=#{mic}"))
+      #col = page.css('div.first-row div.first-column.box-column')
+      #if col then ticker = col.text.strip end
+    #end
+    ticker = ''
+    puts "#{index},#{isin},#{name},#{ticker},#{wt}"
+    $db.execute "INSERT INTO IndexConstituents ([index], isin, ticker, name, wt) VALUES (?,?,?,?,?)", [index, isin, ticker, name, wt.to_f]
   end
 end
 
@@ -59,6 +68,7 @@ end
 def navigate(index, mic, base_url, rel_url)
   url = base_url+rel_url
   puts "Page=>#{url}"
+  # fetch the constituents page...
   page = Nokogiri::HTML(open(url))
 
   # scrape...
