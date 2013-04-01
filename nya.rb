@@ -18,10 +18,14 @@ index = 'NYA'
 isin = ''
 wt = '0.0'
 CSV.new(open("http://www.nyse.com/indexes/nyaindex.csv"), :headers => :first_row).each do |line|
-  name = line[0].strip
-  ticker = line[1].strip
+  name = line[0].force_encoding('UTF-8').strip
+  ticker = line[1].force_encoding('UTF-8').strip
   if name != 'NAME' and ticker != 'TICKER'
     puts "#{index},#{isin},#{name},#{ticker},#{wt}"
-    $db.execute "INSERT INTO IndexConstituents ([index], isin, ticker, name, wt) VALUES (?,?,?,?,?)", [index, isin, ticker, name, wt.to_f]  
+    $db.execute "INSERT INTO IndexConstituents 
+      ([index], isin, ticker, name, wt) 
+      VALUES 
+      (?,?,?,?,?)", 
+      [index, isin, ticker, name, wt.to_f]  
   end
 end
